@@ -11,7 +11,7 @@ const logger = require('./logger').logger('server');
 ///////////////////////////////////////////////////////////
 const model = require('./models/model');
 
-model.init('http://106.15.177.105:8529/');
+model.init();
 
 ///////////////////////////////////////////////////////////
 const isProduction = process.env.NODE_ENV === 'production';
