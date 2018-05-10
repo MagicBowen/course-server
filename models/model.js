@@ -1,8 +1,12 @@
 const Database = require('arangojs').Database;
+const logger = require('../logger').logger('model');
 
 class Model{
     init(uri) {
-        this.db = new Database('http://127.0.0.1:8529');
+        this.db = new Database(uri);
+        this.db.useBasicAuth('root', 'KingDom1234');
+        this.db.useDatabase('waterDrop');
+        this.collection = this.db.collection('courseTable');
     }
 }
 

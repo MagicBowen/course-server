@@ -9,6 +9,11 @@ const staticFiles = require('./static-files');
 const logger = require('./logger').logger('server');
 
 ///////////////////////////////////////////////////////////
+const model = require('./models/model');
+
+model.init('http://106.15.177.105:8529/');
+
+///////////////////////////////////////////////////////////
 const isProduction = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || 3000;
 const host = process.env.PORT || '127.0.0.1';
