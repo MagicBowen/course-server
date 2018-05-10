@@ -1,7 +1,7 @@
 {
-    "name": "koa-server",
+    "name": "course-server",
     "version": "0.0.1",
-    "description": "A koa base framework",
+    "description": "A koa server for wechat app course",
     "main": "server.js",
     "scripts": {
         "start": "node --use_strict server.js"
@@ -10,9 +10,10 @@
     "license": "Apache-2.0",
     "repository": {
         "type": "git",
-        "url": "https://github.com/magicbowen/koa-server.git"
+        "url": "https://github.com/magicbowen/course-server.git"
     },
     "dependencies": {
+        "arangojs": "^5.8.0",
         "koa": "2.0.0",
         "koa-bodyparser": "3.2.0",
         "koa-convert": "^1.2.0",
