@@ -1,24 +1,24 @@
 const logger = require('../logger').logger('phone');
 const model = require('../models/model');
 
-function getPhone(ctx, next) {
+async function getPhone(ctx, next) {
     const openId = ctx.request.query.openid;
-    model.getPhone(openId, (err, phone) => {
+    await model.getPhone(openId, (err, phone) => {
         if(err) {
             logger.error('Get phone err: ' + err);
             ctx.response.status = 404;
         } else {
             ctx.response.type = "application/json";
-            ctx.response.body = phone;
+            ctx.response.body = {phone : phone};
             ctx.response.status = 200;
         }
     });
 }
 
-function postPhone(ctx, next) {
+async function postPhone(ctx, next) {
     const openId = ctx.request.body.openid;
     const phone = ctx.request.body.phone;
-    model.addPhone(openId, phone, (err) => {
+    await model.addPhone(openId, phone, (err) => {
         if(err) {
             logger.error('Add phone err: ' + err);
             ctx.response.status = 404;
@@ -28,10 +28,10 @@ function postPhone(ctx, next) {
     });
 }
 
-function putPhone(ctx, next) {
+async function putPhone(ctx, next) {
     const openId = ctx.request.body.openid;
     const phone = ctx.request.body.phone;
-    model.modifyPhone(openId, phone, (err) => {
+    await model.modifyPhone(openId, phone, (err) => {
         if(err) {
             logger.error('Update phone err: ' + err);
             ctx.response.status = 404;
@@ -41,9 +41,9 @@ function putPhone(ctx, next) {
     });
 }
 
-function deletePhone(ctx, next) {
+async function deletePhone(ctx, next) {
     const openId = ctx.request.query.openid;
-    model.removePhone(openId, (err) => {
+    await model.removePhone(openId, (err) => {
         if(err) {
             logger.error('delete phone err: ' + err);
             ctx.response.status = 404;

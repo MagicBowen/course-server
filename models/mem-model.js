@@ -4,6 +4,7 @@ class Model{
     init() {
         this.course = {};
         this.ids = {};
+        logger.info('Init memory model successful!');
     }
 
     getPhone(openId, callback) {
@@ -11,7 +12,7 @@ class Model{
         if ((!this.ids[openId]) || (!this.ids[openId].phone)) {
             err = `Not found phone for openId ${openId}`;
         }
-        callback(err, this.ids[openId]);
+        callback(err, this.ids[openId].phone);
     }
 
     addPhone(openId, phone, callback) {
@@ -32,7 +33,7 @@ class Model{
     getCourse(openId, callback) {
         var course = this.course[openId];
         var err = course ? null : `Not found course for openId ${openId}`;
-        callback(err, { courseTable : course});
+        callback(err, course);
     }
 
     addCourse(openId, course, callback) {
