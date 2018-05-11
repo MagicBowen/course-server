@@ -102,7 +102,7 @@ class Model{
     async getCourse(openId, callback) {
         const course = await this.queryCourseByUser(openId);
         if (!course) return callback(`Not found course for user ${openId}`); 
-        return callback(null, course);
+        return callback(null, course.courseTable);
     }
 
     async addCourse(openId, course, callback) {
