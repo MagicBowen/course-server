@@ -17,7 +17,7 @@ var oauth = async (ctx) => {
 
     ctx.response.type = "application/json";
     ctx.response.status = 200;
-    ctx.response.body.data = result.data;
+    ctx.response.body = result.data;
 }
 
 module.exports = {
