@@ -68,9 +68,9 @@ class Model{
         if (!user) {
             return callback(`not found user ${openId}`);
         }
-        if (user.phone) {
-            return callback(`user ${openId} already has phone ${user.phone}`);
-        }
+        // if (user.phone) {
+        //     return callback(`user ${openId} already has phone ${user.phone}`);
+        // }
         const result = await this.updatePhoneForUser(user, phone);
         if(result)  return callback(null);
         return callback(`add phone ${phone} failed for user ${openId}`)
@@ -138,7 +138,7 @@ class Model{
         } else {
             logger.info(`Found id ${openId} of user ${JSON.stringify(user)}`);
             if(user.courseId) {
-                return callback(`User ${openId} already has course ${user.courseId}`);
+                await this.modifyCourse(openId, course, callback);
             } else {
                 await saveCourse(user, course, callback);
             }
