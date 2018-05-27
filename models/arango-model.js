@@ -17,6 +17,11 @@ class Model{
         return result._result[0];
     }
 
+    async queryUserByPhone(phone) {
+        const result = await this.db.query(`FOR u IN ${config.userCollection} FILTER u.phone == \"${phone}\" RETURN u`);
+        return result._result[0];
+    }
+
     async queryCourse(courseId) {
         const result = await this.db.query(`FOR c IN ${config.courseCollection} FILTER c._key == \"${courseId}\" RETURN c`);
         return result._result[0];
@@ -52,6 +57,17 @@ class Model{
         }       
     }
 
+    async updateOpenIdForUser(user, openId) {
+        try {
+            await this.userCollection.update(user._key, {openId : openId});
+            logger.debug(`update phone ${phone} success for user ${user.openId}`);
+            return true;
+        } catch (err) {
+            logger.warn(`update phone ${phone} failed for user ${user.openId}`)
+            return false;
+        }       
+    }
+
     async getPhone(openId, callback) {
         const user = await this.queryUser(openId);
         if (!user) {
@@ -64,8 +80,27 @@ class Model{
     }
 
     async addPhone(openId, phone, callback) {
+        const phoneUser = await this.queryUserByPhone(phone)
         const user = await this.queryUser(openId);
-        if (!user) {
+        if(phoneUser && !user){
+            const result = await this.updateOpenIdForUser(phoneUser, openId);
+            if(result) return callback(null);
+            return callback(`add openId ${openId} to  user for ${phone}`)
+        }
+
+        if(phoneUser && user){
+            if(phoneUser._key != user._key){
+             const ret1 = await this.courseCollection.remove(user.courseId)
+             const ret2 = await this.userCollection.remove(user._key)
+             if (!ret1 || !ret2) return callback(`romove course for openId ${openId} failed`)
+             const result = await this.updateOpenIdForUser(phoneUser, openId);
+             if(result) return callback(null);
+             return callback(`add openId ${openId} to  user for ${phone}`)
+            }
+
+        }
+
+        if (!phoneUser &&!user) {
             return callback(`not found user ${openId}`);
         }
         // if (user.phone) {
