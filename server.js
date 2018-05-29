@@ -16,7 +16,7 @@ model.init();
 ///////////////////////////////////////////////////////////
 const isProduction = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || 3000;
-const host = process.env.PORT || '127.0.0.1';
+const host = process.env.HOST || '127.0.0.1';
 
 ///////////////////////////////////////////////////////////
 const app = new Koa();
