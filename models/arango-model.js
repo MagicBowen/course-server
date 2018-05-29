@@ -103,9 +103,7 @@ class Model{
         if (!phoneUser &&!user) {
             return callback(`not found user ${openId}`);
         }
-        // if (user.phone) {
-        //     return callback(`user ${openId} already has phone ${user.phone}`);
-        // }
+
         const result = await this.updatePhoneForUser(user, phone);
         if(result)  return callback(null);
         return callback(`add phone ${phone} failed for user ${openId}`)
@@ -140,55 +138,145 @@ class Model{
         return callback(null, course.courseTable);
     }
 
-    async addCourse(openId, course, callback) {
-        const that = this;
-        const saveCourse = async (user, course, callback) => {
-            try {
-                const meta = await that.courseCollection.save({courseTable : course});
-                try {
-                    const newUser = await that.userCollection.update(user._key, {courseId : meta._key});
-                    logger.info(`Add course ${meta._key} for user ${JSON.stringify(newUser)}`)
-                    return callback(null)                   
-                } catch (err) {
-                    logger.info(`Save course id ${courseId} for user ${user.openId} failed!`);
-                    return callback(err);
-                }
-            } catch (err) {
-                logger.error('DB save course failed!');
-                return callback(err);                
-            }     
-        }
 
-        const user = await this.queryUser(openId);
-        if (!user) {
-            logger.warn(`Not found id ${openId} of user`);
-            try {
-                const newUser = await this.userCollection.save({openId : openId});
-                logger.info(`add new user ${openId}`);
-                return await saveCourse(newUser, course, callback);
-            } catch(err) {
-                logger.error(`DB save user ${openId} failed!`);
-                return callback(err);
-            }
-        } else {
-            logger.info(`Found id ${openId} of user ${JSON.stringify(user)}`);
-            if(user.courseId) {
-                await this.modifyCourse(openId, course, callback);
-            } else {
-                await saveCourse(user, course, callback);
-            }
+    async saveCourse(courseId, course, callback) {
+        try {
+           await that.courseCollection.save({_key: courseId, courseTable : course});
+           logger.info(`add course ${courseId} to table success`)
+        }catch(err){
+           logger.error(`add course ${courseId} to table failed `)
+           callback(err)
         }
     }
 
-    async modifyCourse(openId, course, callback) {
-        const oriCourse = await this.queryCourseByUser(openId);
-        if (!oriCourse) return callback(`Not found course for user ${openId}`); 
-        try {
-            await this.courseCollection.update(oriCourse._key, {courseTable : course});
+    async updateCourse(courseId, course, callback){
+         try {
+            await this.courseCollection.update(courseId, {courseTable : course});
+
             return callback(null);
         } catch (err) {
             return callback(`Update course failed for user ${openId}`);
         }
+
+    }
+
+    aync createUser(openId, callback) {
+        try {
+            courseId = "weixin_" + openId
+            const newUser = await this.userCollection.save({courseId: courseId, openId : openId});
+            logger.info(`add new user ${openId} success`);
+            return newUser
+        } catch(err){
+            logger.error(`add new user ${openId} failed`);
+            callback(err);
+        }
+    }
+
+    aync createOrUpdate(courseId, course, callback) {
+        const courseInfo = await this.queryCourse(user.courseId);
+        if(!courseInfo){
+            await this.saveCourse(user.courseId, course, callback)
+        }
+        else{
+            await this.updateCourse(courseInfo._key, course, callback)
+        }
+
+    }
+
+    async addCourse(openId, course, callback) {
+        // const that = this;
+        // const saveCourse = async (user, course, callback) => {
+        //     try {
+        //         const meta = await that.courseCollection.save({courseTable : course});
+        //         try {
+        //             const newUser = await that.userCollection.update(user._key, {courseId : meta._key});
+        //             logger.info(`Add course ${meta._key} for user ${JSON.stringify(newUser)}`)
+        //             return callback(null)                   
+        //         } catch (err) {
+        //             logger.info(`Save course id ${courseId} for user ${user.openId} failed!`);
+        //             return callback(err);
+        //         }
+        //     } catch (err) {
+        //         logger.error('DB save course failed!');
+        //         return callback(err);                
+        //     }     
+        // }
+
+        var user = await this.queryUser(openId);
+        if(!user){
+            user = await this.createUser(openId, callback)
+        }
+        if(!user){
+            logger.error(`DB save user ${openId} failed!`);
+            return 
+        }
+
+        await this.createOrUpdate(user.courseId, course, callback)
+
+        // const course = await this.queryCourse(user.courseId);
+        // if(!course){
+        //     await this.saveCourse(user.courseId, course, callback)
+        // }
+        // else{
+        //     await this.updateCourse(course._key, course, callback)
+        // }
+
+
+        // const user = await this.queryUser(openId);
+        // if (!user) {
+        //     const newUser = await this.addUser(openId, callback)
+        //     if(newUser == null){
+        //         logger.error(`DB save user ${openId} failed!`);
+        //         return 
+        //     }
+        //     // saveCourse(newUser.courseId, course, callback)
+
+
+        //     // logger.warn(`Not found id ${openId} of user`);
+        //     // try {
+        //     //     const newUser = await this.userCollection.save({openId : openId});
+        //     //     logger.info(`add new user ${openId}`);
+        //     //     return await saveCourse(newUser, course, callback);
+        //     // } catch(err) {
+        //     //     logger.error(`DB save user ${openId} failed!`);
+        //     //     return callback(err);
+        //     // }
+        // } else {
+        //     logger.info(`Found id ${openId} of user ${JSON.stringify(user)}`);
+        //     if(user.courseId) {
+        //         await this.modifyCourse(openId, course, callback);
+        //     } else {
+        //         await this.saveCourse(user.courseId, course, callback);
+        //     }
+        // }
+    }
+
+    async modifyCourse(openId, course, callback) {
+        const user = await this.queryUser(openId);
+        if (!user) {
+            logger.debug(`queryCourseByUser not found user ${openId}`);
+            return callback(`Not found user for user ${openId}`);
+        }
+        await this.createOrUpdate(user.courseId, course, callback)
+
+        // const course = await this.queryCourse(user.courseId);
+        // if(!course){
+        //     await this.saveCourse(user.courseId, course, callback)
+        // }
+        // else{
+        //     await this.updateCourse(course._key, course, callback)
+        // }
+
+        // const oriCourse = await this.queryCourseByUser(openId);
+        // if (!oriCourse) return callback(`Not found course for user ${openId}`); 
+
+        // await this.updateCourse(oriCourse._key, course, callback)
+        // // try {
+        //     await this.courseCollection.update(oriCourse._key, {courseTable : course});
+        //     return callback(null);
+        // } catch (err) {
+        //     return callback(`Update course failed for user ${openId}`);
+        // }
     }
 
     async removeCourse(openId, callback) {
@@ -196,13 +284,13 @@ class Model{
         if (!course) return callback(`Not found course for user ${openId}`); 
         try {
             const user = await this.queryUser(openId);
-            try {
-                await this.userCollection.update(user._key, {courseId : null});
-                logger.debug(`remove course id ${course._key} for user ${openId}`);
-            } catch (err) {
-                return callback(`remove course id ${course._key} failed for user ${openId}`);
-            }
-            await this.courseCollection.remove(course._key);
+            // try {
+            //     await this.userCollection.update(user._key, {courseId : null});
+            //     logger.debug(`remove course id ${course._key} for user ${openId}`);
+            // } catch (err) {
+            //     return callback(`remove course id ${course._key} failed for user ${openId}`);
+            // }
+            await this.courseCollection.remove(user.courseId);
             return callback(null);
         } catch (err) {
             return callback(`remove course ${course._key} failed for user ${openId}`);
