@@ -173,9 +173,9 @@ class Model{
     }
 
     async createOrUpdate(courseId, course, callback) {
-        const courseInfo = await this.queryCourse(user.courseId);
+        const courseInfo = await this.queryCourse(courseId);
         if(!courseInfo){
-            await this.createCourse(user.courseId, course, callback)
+            await this.createCourse(courseId, course, callback)
         }
         else{
             await this.updateCourse(courseInfo._key, course, callback)
