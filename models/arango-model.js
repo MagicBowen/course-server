@@ -139,7 +139,7 @@ class Model{
     }
 
 
-    async saveCourse(courseId, course, callback) {
+    async createCourse(courseId, course, callback) {
         try {
            await that.courseCollection.save({_key: courseId, courseTable : course});
            logger.info(`add course ${courseId} to table success`)
@@ -160,7 +160,7 @@ class Model{
 
     }
 
-    aync createUser(openId, callback) {
+    async createUser(openId, callback) {
         try {
             courseId = "weixin_" + openId
             const newUser = await this.userCollection.save({courseId: courseId, openId : openId});
@@ -172,15 +172,14 @@ class Model{
         }
     }
 
-    aync createOrUpdate(courseId, course, callback) {
+    async createOrUpdate(courseId, course, callback) {
         const courseInfo = await this.queryCourse(user.courseId);
         if(!courseInfo){
-            await this.saveCourse(user.courseId, course, callback)
+            await this.createCourse(user.courseId, course, callback)
         }
         else{
             await this.updateCourse(courseInfo._key, course, callback)
         }
-
     }
 
     async addCourse(openId, course, callback) {
