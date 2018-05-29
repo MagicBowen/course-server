@@ -101,9 +101,10 @@ class Model{
         }
 
         if (!phoneUser &&!user) {
+            var courseId = "weixin_" + openId
             var userInfo = {phone : phone, courseId: courseId, openId : openId}
             logger.info(`=====>add user info ${userInfo}`)
-            const newUser = await this.userCollection.save(userInfo);
+            await this.userCollection.save(userInfo);
             return callback(`add phone ${phone} successful for user ${openId}`)
         }
 
