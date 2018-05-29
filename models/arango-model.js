@@ -166,9 +166,10 @@ class Model{
         try {
             var courseId = "weixin_" + openId
             logger.info(`=====> add new user ${openId}  courseId: ${courseId} `);
-            const newUser = await this.userCollection.save({courseId: courseId, openId : openId});
+            const userInfo = {courseId: courseId, openId : openId}
+            await this.userCollection.save(userInfo);
             logger.info(`add new user ${openId} success`);
-            return newUser
+            return userInfo
         } catch(err){
             logger.error(`add new user ${openId} failed`);
             callback(err);
@@ -194,6 +195,8 @@ class Model{
             logger.error(`DB save user ${openId} failed!`);
             return 
         }
+
+        logger.error("user info :" + user)
 
         await this.createOrUpdate(user.courseId, course, callback)
 
