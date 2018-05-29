@@ -141,7 +141,7 @@ class Model{
 
     async createCourse(courseId, course, callback) {
         try {
-           await that.courseCollection.save({_key: courseId, courseTable : course});
+           await this.courseCollection.save({_key: courseId, courseTable : course});
            logger.info(`add course ${courseId} to table success`)
         }catch(err){
            logger.error(`add course ${courseId} to table failed `)
