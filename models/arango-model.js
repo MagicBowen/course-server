@@ -103,7 +103,6 @@ class Model{
         if (!phoneUser &&!user) {
             var courseId = "weixin_" + openId
             var userInfo = {phone : phone, courseId: courseId, openId : openId}
-            logger.info(`=====>add user info ${userInfo}`)
             await this.userCollection.save(userInfo);
             logger.info(`add phone ${phone} successful for user ${openId}`)
             return callback(null)
@@ -162,7 +161,6 @@ class Model{
         } catch (err) {
             return callback(`Update course failed for user ${openId}`);
         }
-
     }
 
     async createUser(openId, callback) {
@@ -198,9 +196,6 @@ class Model{
             logger.error(`DB save user ${openId} failed!`);
             return callback(`DB save user ${openId} failed!`)
         }
-
-        logger.error("user info :" + user)
-
         await this.createOrUpdate(user.courseId, course, callback)
     }
 
