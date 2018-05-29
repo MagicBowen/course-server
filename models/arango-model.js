@@ -152,6 +152,7 @@ class Model{
     async updateCourse(courseId, course, callback){
          try {
             await this.courseCollection.update(courseId, {courseTable : course});
+            logger.info(`update course ${courseId} to table success`)
 
             return callback(null);
         } catch (err) {
