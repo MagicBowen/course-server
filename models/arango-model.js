@@ -105,7 +105,8 @@ class Model{
             var userInfo = {phone : phone, courseId: courseId, openId : openId}
             logger.info(`=====>add user info ${userInfo}`)
             await this.userCollection.save(userInfo);
-            return callback(`add phone ${phone} successful for user ${openId}`)
+            logger.info(`add phone ${phone} successful for user ${openId}`)
+            return callback(null)
         }
 
         const result = await this.updatePhoneForUser(user, phone);
@@ -146,6 +147,7 @@ class Model{
         try {
            await this.courseCollection.save({_key: courseId, courseTable : course});
            logger.info(`add course ${courseId} to table success`)
+           callback(null);
         }catch(err){
            logger.error(`add course ${courseId} to table failed `)
            callback(err)
@@ -170,7 +172,6 @@ class Model{
             const userInfo = {courseId: courseId, openId : openId}
             await this.userCollection.save(userInfo);
             logger.info(`add new user ${openId} success`);
-            return userInfo
         } catch(err){
             logger.error(`add new user ${openId} failed`);
             callback(err);
@@ -190,17 +191,17 @@ class Model{
     async addCourse(openId, course, callback) {
         var user = await this.queryUser(openId);
         if(!user){
-            user = await this.createUser(openId, callback)
+            await this.createUser(openId, callback)
+            var user = await this.queryUser(openId);
         }
         if(!user){
             logger.error(`DB save user ${openId} failed!`);
-            return 
+            return callback(`DB save user ${openId} failed!`)
         }
 
         logger.error("user info :" + user)
 
         await this.createOrUpdate(user.courseId, course, callback)
-
     }
 
     async modifyCourse(openId, course, callback) {
@@ -209,8 +210,8 @@ class Model{
             logger.debug(`queryCourseByUser not found user ${openId}`);
             return callback(`Not found user for user ${openId}`);
         }
-        await this.createOrUpdate(user.courseId, course, callback)
 
+        await this.createOrUpdate(user.courseId, course, callback)
     }
 
     async removeCourse(openId, callback) {
