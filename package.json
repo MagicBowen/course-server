@@ -14,7 +14,6 @@
     },
     "dependencies": {
         "arangojs": "^5.8.0",
-        "gaoxin_sms_gateway": "0.0.2",
         "koa": "2.0.0",
         "koa-bodyparser": "3.2.0",
         "koa-convert": "^1.2.0",
