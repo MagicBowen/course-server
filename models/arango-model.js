@@ -57,7 +57,7 @@ class Model{
         }       
     }
 
-    async updateOpenIdForUser(user, openId) {
+    async updateOpenIdForUser(user, openId, phone) {
         try {
             await this.userCollection.update(user._key, {openId : openId});
             logger.debug(`update phone ${phone} success for user ${user.openId}`);
@@ -83,17 +83,18 @@ class Model{
         const phoneUser = await this.queryUserByPhone(phone)
         const user = await this.queryUser(openId);
         if(phoneUser && !user){
-            const result = await this.updateOpenIdForUser(phoneUser, openId);
+            const result = await this.updateOpenIdForUser(phoneUser, openId, phone);
             if(result) return callback(null);
             return callback(`add openId ${openId} to  user for ${phone}`)
         }
 
         if(phoneUser && user){
             if(phoneUser._key != user._key){
+             logger.info('use the course info by phone and delete course table user.courseId')
              const ret1 = await this.courseCollection.remove(user.courseId)
              const ret2 = await this.userCollection.remove(user._key)
              if (!ret1 || !ret2) return callback(`romove course for openId ${openId} failed`)
-             const result = await this.updateOpenIdForUser(phoneUser, openId);
+             const result = await this.updateOpenIdForUser(phoneUser, openId, phone);
              if(result) return callback(null);
              return callback(`add openId ${openId} to  user for ${phone}`)
             }
