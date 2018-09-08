@@ -14,8 +14,8 @@ const model = require('./models/model');
 model.init();
 
 ///////////////////////////////////////////////////////////
-const isProduction = process.env.NODE_ENV === 'production';
-// const isProduction = true;
+// const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = true;
 const port = process.env.PORT || 9001;
 const host = process.env.HOST || '0.0.0.0';
 
