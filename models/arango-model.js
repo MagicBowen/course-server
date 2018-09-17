@@ -80,8 +80,11 @@ class Model{
     }
 
     async addPhone(openId, phone, callback) {
+        logger.info(`add phone ${phone} , openId ${openId}`)
         const phoneUser = await this.queryUserByPhone(phone)
+        logger.info(`step 1111111111 ${phoneUser}`)
         const user = await this.queryUser(openId);
+        logger.info(`step 222222 ${user}`)
         if(phoneUser && !user){
             const result = await this.updateOpenIdForUser(phoneUser, openId, phone);
             if(result) return callback(null);
