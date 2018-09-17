@@ -82,9 +82,9 @@ class Model{
     async addPhone(openId, phone, callback) {
         logger.info(`add phone ${phone} , openId ${openId}`)
         const phoneUser = await this.queryUserByPhone(phone)
-        logger.info(`step 1111111111 ${phoneUser}`)
+        logger.info(`step 1111111111 ${JSON.stringify(phoneUser)}`)
         const user = await this.queryUser(openId);
-        logger.info(`step 222222 ${user}`)
+        logger.info(`step 222222 ${JSON.stringify(user)}`)
         if(phoneUser && !user){
             const result = await this.updateOpenIdForUser(phoneUser, openId, phone);
             if(result) return callback(null);
@@ -104,7 +104,7 @@ class Model{
              //     return callback(`add openId ${openId} to  user success for ${phone}`)                
              // } else {
                 logger.info('use the course info by weixin and delete course table by xiaomi')
-                await this.userCollection.remove(phoneUser.courseId)
+                await this.userCollection.remove(phoneUser._key)
                 await this.updatePhoneForUser(user, phone);
                 return callback(`add openId ${openId} to  user success for ${phone}`)                
              // }
