@@ -187,13 +187,20 @@ class Model{
                 const userInfo = {courseId: courseId, openId : openId, duerosId : duerosId};
                 await this.userCollection.save(userInfo);
                 logger.info(`add new dueros user ${openId} : ${duerosId} success`);
+                return callback(null);
             } catch(err){
                 logger.error(`add new dueros user ${openId} : ${duerosId} failed`);
                 callback(err);
             }
         } else {
-            await this.userCollection.update(user._key, {duerosId : duerosId});
-            logger.debug(`update duerosId ${duerosId} success for user ${user.openId}`);
+            try {
+                await this.userCollection.update(user._key, {duerosId : duerosId});
+                logger.debug(`update duerosId ${duerosId} success for user ${user.openId}`);
+                return callback(null);
+            } catch(err) {
+                logger.error(`update dueros user ${openId} : ${duerosId} failed`);
+                callback(err);                
+            }
         }
     }
 
@@ -218,13 +225,14 @@ class Model{
         else{
             await this.updateCourse(courseInfo._key, course, callback)
         }
+        return callback(null);
     }
 
     async addCourse(openId, course, callback) {
         var user = await this.queryUser(openId);
         if(!user){
             await this.createUser(openId, callback)
-            var user = await this.queryUser(openId);
+            user = await this.queryUser(openId);
         }
         if(!user){
             logger.error(`DB save user ${openId} failed!`);
