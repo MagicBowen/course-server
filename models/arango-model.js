@@ -82,9 +82,7 @@ class Model{
     async addPhone(openId, phone, callback) {
         logger.info(`add phone ${phone} , openId ${openId}`)
         const phoneUser = await this.queryUserByPhone(phone)
-        logger.info(`step 1111111111 ${JSON.stringify(phoneUser)}`)
         const user = await this.queryUser(openId);
-        logger.info(`step 222222 ${JSON.stringify(user)}`)
         if(phoneUser && !user){
             const result = await this.updateOpenIdForUser(phoneUser, openId, phone);
             if(result) return callback(null);
@@ -93,21 +91,10 @@ class Model{
 
         if(phoneUser && user){
             if(phoneUser._key != user._key){
-             // const course = await this.queryCourse(user.courseId);
-             // if(!course){
-             //     logger.info('use the course info by xiaomi and delete course table by weixin')
-             //     const ret1 = await this.courseCollection.remove(user.courseId)
-             //     const ret2 = await this.userCollection.remove(user._key)
-             //     if (!ret1 || !ret2) return callback(`romove course for openId ${openId} failed`)
-             //     const result = await this.updateOpenIdForUser(phoneUser, openId, phone);
-             //     if(result) return callback(null);
-             //     return callback(`add openId ${openId} to  user success for ${phone}`)                
-             // } else {
                 logger.info('use the course info by weixin and delete course table by xiaomi')
                 await this.userCollection.remove(phoneUser._key)
                 await this.updatePhoneForUser(user, phone);
                 return callback(`add openId ${openId} to  user success for ${phone}`)                
-             // }
             }
         }
 
