@@ -17,6 +17,14 @@ class Model{
         return result._result[0];
     }
 
+    async queryUserByDuerosId(duerosId) {
+        const result = await this.db.query(`FOR u IN ${config.userCollection} FILTER u.duerosId == \"${duerosId}\" RETURN u`);
+        for (let user of result._result) {
+            if (!user.openId) return user
+        }
+        return null
+    }
+
     async queryUserByPhone(phone) {
         const result = await this.db.query(`FOR u IN ${config.userCollection} FILTER u.phone == \"${phone}\" RETURN u`);
         return result._result[0];
@@ -167,20 +175,30 @@ class Model{
 
     async createDuerosUser(openId, duerosId, callback) {
         var user = await this.queryUser(openId);
+        var duerosUser = await this.queryUserByDuerosId(duerosId)
         if(!user){
             try {
-                var courseId = this.generateCourseIdFromOpenId(openId)
-                logger.info(`=====> add new user ${openId} duerosId ${duerosId} courseId: ${courseId} `);
-                const userInfo = {courseId: courseId, openId : openId, duerosId : duerosId};
-                await this.userCollection.save(userInfo);
-                logger.info(`add new dueros user ${openId} : ${duerosId} success`);
-                return callback(null);
+                if (duerosUser) {
+                    await this.userCollection.update(duerosUser._key, {openId : openId});
+                    logger.debug(`add openId ${openId} for dueros user ${duerosId} success`);
+                    return callback(null);
+                } else {
+                    var courseId = this.generateCourseIdFromOpenId(openId)
+                    logger.info(`=====> add new user ${openId} duerosId ${duerosId} courseId: ${courseId} `);
+                    const userInfo = {courseId: courseId, openId : openId, duerosId : duerosId};
+                    await this.userCollection.save(userInfo);
+                    logger.info(`add new dueros user ${openId} : ${duerosId} success`);
+                    return callback(null);
+                }
             } catch(err){
                 logger.error(`add new dueros user ${openId} : ${duerosId} failed`);
                 callback(err);
             }
         } else {
             try {
+                if (duerosUser) {
+                    await this.userCollection.remove(duerosUser._key);
+                }
                 await this.userCollection.update(user._key, {duerosId : duerosId});
                 logger.debug(`update duerosId ${duerosId} success for user ${user.openId}`);
                 return callback(null);
