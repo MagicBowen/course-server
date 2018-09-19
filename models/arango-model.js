@@ -163,9 +163,32 @@ class Model{
         }
     }
 
+    generateCourseIdFromOpenId(openId) {
+        return "weixin_" + openId
+    }
+
+    async createDuerosUser(openId, duerosId, callback) {
+        var user = await this.queryUser(openId);
+        if(!user){
+            try {
+                var courseId = this.generateCourseIdFromOpenId(openId)
+                logger.info(`=====> add new user ${openId} duerosId ${duerosId} courseId: ${courseId} `);
+                const userInfo = {courseId: courseId, openId : openId, duerosId : duerosId};
+                await this.userCollection.save(userInfo);
+                logger.info(`add new dueros user ${openId} : ${duerosId} success`);
+            } catch(err){
+                logger.error(`add new dueros user ${openId} : ${duerosId} failed`);
+                callback(err);
+            }
+        } else {
+            await this.userCollection.update(user._key, {duerosId : duerosId});
+            logger.debug(`update duerosId ${duerosId} success for user ${user.openId}`);
+        }
+    }
+
     async createUser(openId, callback) {
         try {
-            var courseId = "weixin_" + openId
+            var courseId = this.generateCourseIdFromOpenId(openId)
             logger.info(`=====> add new user ${openId}  courseId: ${courseId} `);
             const userInfo = {courseId: courseId, openId : openId}
             await this.userCollection.save(userInfo);
