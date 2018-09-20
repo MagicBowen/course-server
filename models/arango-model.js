@@ -65,6 +65,17 @@ class Model{
         }       
     }
 
+    async updatePhoneAndxiaomiIdForUser(user, phone, xiaomiId) {
+        try {
+            await this.userCollection.update(user._key, {phone : phone, xiaomiId: xiaomiId});
+            logger.debug(`update phone ${phone} success for user ${user.openId}`);
+            return true;
+        } catch (err) {
+            logger.warn(`update phone ${phone} failed for user ${user.openId}`)
+            return false;
+        }       
+    }
+
     async updateOpenIdForUser(user, openId, phone) {
         try {
             await this.userCollection.update(user._key, {openId : openId});
