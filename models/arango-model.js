@@ -112,8 +112,9 @@ class Model{
             if(phoneUser._key != user._key){
                 logger.info('use the course info by weixin and delete course table by xiaomi')
                 await this.userCollection.remove(phoneUser._key)
-                await this.updatePhoneForUser(user, phone);
-                return callback(`add openId ${openId} to  user success for ${phone}`)                
+                await this.updatePhoneAndxiaomiIdForUser(user, phone, phoneUser.xiaomiId);
+                loger.info(`add openId ${openId} to  user success for ${phone}`)
+                return callback(null)                
             }
         }
 
