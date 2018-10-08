@@ -113,7 +113,7 @@ class Model{
                 logger.info('use the course info by weixin and delete course table by xiaomi')
                 await this.userCollection.remove(phoneUser._key)
                 await this.updatePhoneAndxiaomiIdForUser(user, phone, phoneUser.xiaomiId);
-                loger.info(`add openId ${openId} to  user success for ${phone}`)
+                logger.info(`add openId ${openId} to  user success for ${phone}`)
                 return callback(null)                
             }
         }
